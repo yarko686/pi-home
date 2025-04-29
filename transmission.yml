@@ -1,0 +1,49 @@
+version: '3.9'
+services:
+  gluetun:
+    container_name: gluetun
+    image: qmcgaw/gluetun 
+    init: true
+    restart: unless-stopped
+    environment:
+      - VPN_SERVICE_PROVIDER=protonvpn
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=<WG_PK>
+    cap_add:
+      - NET_ADMIN
+    # sysctl net.ipv4.conf.all.rp_filter is mandatory!
+    # net.ipv6.conf.all.disable_ipv6 disables IPv6 as protonVPN does not support IPv6.
+    # 'net.*' sysctls are not required on application containers,
+    # as they share network stack with protonwire container.
+    sysctls:
+      net.ipv4.conf.all.rp_filter: 2
+      net.ipv6.conf.all.disable_ipv6: 1
+    volumes:
+      - type: tmpfs
+        target: /tmp
+    ports:
+      - 9091:9091
+      - 51413:51413
+      - 51413:51413/udp
+  transmission:
+    image: ghcr.io/linuxserver/transmission
+    container_name: transmission
+    network_mode: service:gluetun
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Kiev
+        #- TRANSMISSION_WEB_HOME=/combustion-release/ #optional
+      - USER=<USERNAME>
+      - PASS=<PASSWORD>
+    volumes:
+      - /etc/transmission:/config
+      - /mnt/wd_black/transmission:/downloads
+      - /etc/transmission:/watch
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f https://ifconfig.me || exit 1" ]
+      interval: 30m
+      timeout: 5s
+      retries: 3
+      start_period: 1m

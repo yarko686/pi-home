@@ -1,0 +1,13 @@
+version: '3.9'
+services:
+  homeassistant:
+    container_name: home-assistant
+    image: homeassistant/raspberrypi4-homeassistant:stable
+    devices:
+      - /dev/serial/by-id/usb-Texas_Instruments_TI_CC2531_USB_CDC___0X00124B000BE8B139-if00:/dev/serial/by-id/usb-Texas_Instruments_TI_CC2531_USB_CDC___0X00124B000BE8B139-if00 
+    privileged: true
+    volumes:
+      - ./homeassistant/config.d:/config
+      - /run/dbus:/run/dbus:ro
+    restart: always
+    network_mode: host

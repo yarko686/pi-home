@@ -1,0 +1,13 @@
+version: '3.9'
+services:
+  nfs:
+    image: itsthenetwork/nfs-server-alpine:11-arm
+    container_name: nfs
+    restart: unless-stopped
+    privileged: true
+    environment:
+      - SHARED_DIRECTORY=/nfsshare
+    volumes:
+      - /mnt/wd_black:/nfsshare
+    ports:
+      - 2049:2049
