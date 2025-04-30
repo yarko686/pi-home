@@ -15,12 +15,15 @@ services:
       #- "67:67/udp"
       # Uncomment the line below if you are using Pi-hole as your NTP server
       #- "123:123/udp"
+    env_file:
+      - path: ./.env
+        required: true
     environment:
       # Set the appropriate timezone for your location from
       # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones, e.g:
       TZ: 'Europe/Kyiv'
       # Set a password to access the web interface. Not setting one will result in a random password being assigned
-      FTLCONF_webserver_api_password: '<PASSWORD>'
+      FTLCONF_webserver_api_password: ${PIHOLE_PW}
       # If using Docker's default `bridge` network setting the dns listening mode should be set to 'all'
       FTLCONF_dns_listeningMode: 'all'
     # Volumes store your data between container upgrades
