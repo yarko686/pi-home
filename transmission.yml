@@ -5,10 +5,13 @@ services:
     image: qmcgaw/gluetun 
     init: true
     restart: unless-stopped
+    env_file:
+      - path: ./.env
+        required: true
     environment:
       - VPN_SERVICE_PROVIDER=protonvpn
       - VPN_TYPE=wireguard
-      - WIREGUARD_PRIVATE_KEY=<WG_PK>
+      - WIREGUARD_PRIVATE_KEY=${WG_PRIVATE_KEY}
     cap_add:
       - NET_ADMIN
     # sysctl net.ipv4.conf.all.rp_filter is mandatory!
@@ -29,13 +32,16 @@ services:
     image: ghcr.io/linuxserver/transmission
     container_name: transmission
     network_mode: service:gluetun
+    env_file:
+      - path: ./.env
+        required: true
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Kiev
         #- TRANSMISSION_WEB_HOME=/combustion-release/ #optional
-      - USER=<USERNAME>
-      - PASS=<PASSWORD>
+      - USER=yarko
+      - PASS=${TRANSMISSION_PW}
     volumes:
       - /etc/transmission:/config
       - /mnt/wd_black/transmission:/downloads
